@@ -89,6 +89,6 @@ class APIClient:
             if res.status_code != 200:
                 raise ValueError('Commands export Failed!')
             with io.BytesIO(res.content) as fh:
-                self._commands_df = pd.io.excel.read_excel(fh, sheetname=0)
+                self._commands_df = pd.io.excel.read_excel(fh)
 
         return self._commands_df
