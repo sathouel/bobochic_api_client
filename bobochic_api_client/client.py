@@ -90,5 +90,6 @@ class APIClient:
                 raise ValueError('Commands export Failed!')
             with io.BytesIO(res.content) as fh:
                 self._commands_df = pd.io.excel.read_excel(fh)
+            self._commands_df = self._commands_df.where(pd.notnull(self._commands_df), None)
 
         return self._commands_df

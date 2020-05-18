@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bobochic-api-client",
-    version="0.0.2",
+    version="0.0.3",
     author="Steven Athouel",
     author_email="sathouel@gmail.com",
     description="A simple api client for bobochic suppliers",
