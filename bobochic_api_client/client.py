@@ -1,22 +1,21 @@
 import os
 import re
+import io
 
 import pandas as pd
 import requests as rq
 
 from . import (
-    utils,
-    DATA_DIR
+    utils
 )
 
 class APIClient:
     BASE_URL = 'https://bobochicparis.com'
 
-    def __init__(self, email, password, data_dirpath=DATA_DIR):
+    def __init__(self, email, password):
         self._session = rq.Session()
         self._email = email
         self._password = password
-        self._data_dirpath = data_dirpath
 
         res = self._login()
         if res.status_code != 200:
@@ -33,7 +32,6 @@ class APIClient:
 
 
     def fetch_commands(self):
-        self._export_commands_to_excel()
         commands = []
         for ref, date, customer, phone, address, items, _, _, _ in self.commands_df.values:
             command = {
@@ -84,19 +82,13 @@ class APIClient:
         }
         return self._session.post(login_url, data=login_data)
 
-    def _export_commands_to_excel(self):
-        res = self._session.get(self.endpoints.get('commands_export'))
-        if res.status_code != 200:
-            raise ValueError('Commands export Failed!')
-
-        export_filepath = os.path.join(self._data_dirpath, 'commands.xlsx')
-        with open(export_filepath, "wb") as f:
-            f.write(res.content)
-            f.close()
-
     @property
     def commands_df(self):
-        filepath = os.path.join(self._data_dirpath, 'commands.xlsx')
-        if not os.path.exists(filepath):
-            self._export_commands_to_excel()
-        return pd.read_excel(filepath)
+        if not hasattr(self, '_commands_df'):
+            res = self._session.get(self.endpoints.get('commands_export'))
+            if res.status_code != 200:
+                raise ValueError('Commands export Failed!')
+            with io.BytesIO(res.content) as fh:
+                self._commands_df = pd.io.excel.read_excel(fh, sheetname=0)
+
+        return self._commands_df
