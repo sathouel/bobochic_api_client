@@ -37,7 +37,7 @@ class APIClient:
             command = {
                 'ref': ref,
                 'date': date,
-                'customer': customer.title(),
+                'customer': customer.title() if customer else None,
                 'phone': phone,
                 'address': self._get_parsed_address(address),
                 'items': self._get_parsed_items(items),
