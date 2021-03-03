@@ -65,7 +65,7 @@ class APIClient:
         return parsed_address[0] if len(parsed_address) > 0 else {}
 
     def _get_parsed_items(self, items):
-        pattern = r'([\d]+) x.+?REF.+?([\d]+[A-Z]*)'
+        pattern = r'([\d]+) x.+?REF.+?([\d]+[A-Z]{0,2}[\d]{0,1})'
         parsed_items = [
             {
                 'sku': sku,
