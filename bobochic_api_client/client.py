@@ -27,7 +27,10 @@ class APIClient:
             'login': utils.urljoin(self.BASE_URL, 'supplier/login'),
             'commands_html': utils.urljoin(self.BASE_URL, 'supplier/commande'),
             'commands_export': utils.urljoin(self.BASE_URL, 'supplier/include/export.php'),
-            'get_file': utils.urljoin(self.BASE_URL, 'modules/relaiscolisam/files/in/etiquette/get_file.php')
+            'get_file': [
+                utils.urljoin(self.BASE_URL, 'modules/relaiscolisam/files/in/etiquette/get_file.php'),
+                utils.urljoin(self.BASE_URL, 'modules/virtransport/files/out/label/get_file.php'),
+            ]
         }
 
 
@@ -41,16 +44,16 @@ class APIClient:
                 'phone': phone,
                 'address': self._get_parsed_address(address),
                 'items': self._get_parsed_items(items),
-                'shipping_label_url': self._get_shipping_label_link(ref)
             }
             commands.append(command)
         return commands
 
-    def _get_shipping_label_link(self, command_ref, check_valid_link=False):
-        url = '{}?file={}.pdf'.format(self.endpoints.get('get_file'), command_ref)
-        if check_valid_link and self._session.get(url).status_code != 200:
-            url = None
-        return url
+    def _get_shipping_label_link(self, command_ref):
+        for endpoint in self.endpoints.get('get_file', []):
+            url = '{}?file={}.pdf'.format(endpoint, command_ref)
+            if self._session.get(url).status_code == 200:
+                return url
+        return ''
 
     def _get_parsed_address(self, address):
         pattern = r'(.+?) ([\d]{4,5}) (.+?) \(FR\)'
