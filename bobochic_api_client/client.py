@@ -68,12 +68,14 @@ class APIClient:
         return parsed_address[0] if len(parsed_address) > 0 else {}
 
     def _get_parsed_items(self, items):
-        pattern = r'([\d]+) x.+?REF.+?([\d]+[A-Z]{0,2}[\d]{0,1})'
+        # pattern = r'([\d]+) x.+?REF.+?([\d]+[A-Z]{0,2}[\d]{0,1})'
+        pattern = r'([\d]+) x.+?EAN.+?([\d]{13}).+?REF.+?([\d]+[A-Z]{0,2}[\d]{0,1})'
         parsed_items = [
             {
                 'sku': sku,
-                'qty': qty
-            } for (qty, sku) in re.findall(pattern, items)
+                'qty': qty,
+                'barcode': ean
+            } for (qty, ean, sku) in re.findall(pattern, items)
         ]
         return parsed_items if len(parsed_items) > 0 else []
 
